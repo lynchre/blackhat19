@@ -1,0 +1,144 @@
+Bachelor Degrees women
+
+
+```{r, echo = FALSE, fig.cap = "©NCES, US Department of Education"}
+edu = read.csv("~/Downloads/cs_edu.csv")
+
+# TODO try to rotate y labels
+# TODO add footnote source
+plot(edu$Year, edu$Percent.Female, type = "l", lwd = 3,
+     main = "\nPercentage of CS Degrees Earned by Women\n",
+     xlab = "Year",
+     ylab = "Percent",
+     col = "dodgerblue4",
+     ylim=range(0:40),
+     xlim=range(1970:2012))
+
+```
+
+
+```{r}
+library(reshape2)
+library(ggplot2)
+library(stringr)
+spons = read.csv("~/Downloads/sponsor.csv")
+df = data.frame(Exp = spons$exp, Percent = spons$percent, Sponsored = spons$spons)
+df$Exp = str_wrap(df$Exp, width = 15)
+
+p = ggplot(df, aes(fill = Sponsored, x = Exp, y = Percent)) + geom_bar(position="dodge", stat = "identity", width = 0.5)  + 
+  labs(x="", y="Percent\n") + scale_fill_manual(values = c("gold2", "dodgerblue4"), labels = c("Sponsored", "Unsponsored")) + 
+  ggtitle("\nExperiences of Sponsored vs. Unsponsored Women\n") +
+  theme(plot.title = element_text(size=15,hjust = 0.5), text = element_text(size=14))
+
+p + coord_flip()
+```
+
+
+Unfair Treatment
+
+```{r, echo = FALSE, fig.cap = "Scott et al., 2017"}
+# TODO foot note source
+
+unfair = read.csv("~/Downloads/unfair2.csv")
+df = data.frame(Reason = unfair$Reason, Percent = unfair$Percent, Gender = unfair$Gender)
+df$Reason = str_wrap(df$Reason, width = 15)
+data.m = melt(df)
+
+
+p = ggplot(data.m, aes(fill = Gender, x = Reason, y = value)) + geom_bar(position="dodge", stat = "identity", width = 0.5) +
+  labs(x = "", y = "\nPercent\n") + scale_fill_manual(values = c("dodgerblue4", "gold2"), labels = c("Male", "Female")) + 
+  ggtitle("\nWorkplace Experiences by Gender\n") +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size=12))
+
+p + coord_flip()
+
+```
+
+```{r, echo = FALSE, fig.cap = "https://datausa.io/profile/university/carnegie-mellon-university"}
+library("scales")
+retain = read.csv("~/Downloads/retain.csv")
+df = data.frame(Year = retain$Year, Percent = retain$Percent, Institution = retain$CMU...Ntl.)
+retain$Year = toString(retain$Year)
+ggplot(df, aes(fill = Institution, x = Year, y = Percent)) + geom_bar(position="dodge", stat = "identity", width = 0.5) +
+  labs(x = "\nYear\n", y = "\nPercent\n") + scale_fill_manual(values = c("dodgerblue4", "gold2"), labels = c("National Avg.", "CMU")) +
+  ggtitle("\nCS Bachelor's Degrees Conferred to Women\n") + theme(plot.title = element_text(hjust = 0), text = element_text(size=14)) + 
+  scale_y_continuous(limits=c(0,26),oob = rescale_none)
+```
+
+```{r, fig.cap = "Frieze & Quesenberry, 2019", echo = FALSE}
+enroll = read.csv("~/Downloads/enrollment.csv")
+
+plot(x = enroll$Year, y = enroll$Male, type = "l", lwd = 3,
+     main = "Gender Breakdown of CS Enrollment at CMU",
+     xlab = "Year",
+     ylab = "Percent",
+     col = "dodgerblue4",
+     ylim = range(0:80))
+lines(x = enroll$Year, y = enroll$Female, col = "gold2", lwd = 4)
+legend("topright", legend=c("Male","Female"), pch=c(19,19), col=c("dodgerblue4", "gold2"), title="Gender")
+```
+
+
+
+```{r, fig.cap = "Rerendered from Glass et al., 2013", echo = FALSE}
+fte = read.csv("~/Downloads/fte_retention.csv")
+
+plot(x = fte$tenure, y = fte$stem * 100, type = "l",
+     main = "Women Remaining in STEM vs. Non-STEM Roles",
+     xlab = "Tenure (Years)",
+     ylab = "Percent Remaining",
+     col = "gold2",
+     lwd = 3,
+     ylim=range(0:100))
+lines(x = fte$tenure, y = fte$non.stem * 100, type = "l", lwd = 3, col = "dodgerblue4")
+legend("bottomleft", legend=c("STEM","Non-STEM"), pch=c(19,19), col=c("gold2", "dodgerblue4"))
+```
+
+
+
+
+```{r, fig.cap = "Hewlett et al., 2008", echo = FALSE}
+# TODO make them line up???
+library(gridExtra)
+library(cowplot)
+use = read.csv("~/Downloads/use.csv")
+dont = read.csv("~/Downloads/dont.csv")
+use_df = data.frame(Reason = use$Reason, Percent = use$Percent)
+dont_df = data.frame(Reason = dont$Reason, Percent = dont$Percent)
+use_df$Reason = str_wrap(use_df$Reason, width = 20)
+dont_df$Reason = str_wrap(dont_df$Reason, width = 20)
+use_pl = ggplot(use_df, aes(x = Reason, y = Percent)) + geom_bar(stat = "identity", fill = "dodgerblue4", width = 0.5) + ggtitle("Use Training") +
+  labs(x = "", y = "") + ylim(0,25) + coord_flip()+ theme(text=element_text(size=14))
+
+area.color = c( "dodgerblue4", "dodgerblue4", "dodgerblue4")
+dont_pl = ggplot(dont_df, aes(x = Reason, y = Percent)) + geom_bar(stat = "identity", width = 0.5, fill=area.color) + ggtitle("Abandon Training") +
+  labs(x = "", y = "\nPercent") + coord_flip() + ylim(0,25) + theme(text=element_text(size=14))
+
+
+plot_grid(use_pl, dont_pl, align="v", nrow=2)
+```
+
+```{r}
+# TODO make them line up???
+library(gridExtra)
+library(cowplot)
+use = read.csv("~/Downloads/use.csv")
+dont = read.csv("~/Downloads/dont.csv")
+use_df = data.frame(Reason = use$Reason, Percent = use$Percent)
+dont_df = data.frame(Reason = dont$Reason, Percent = dont$Percent)
+use_df$Reason = str_wrap(use_df$Reason, width = 20)
+dont_df$Reason = str_wrap(dont_df$Reason, width = 20)
+use_pl = ggplot(use_df, aes(x = Reason, y = Percent)) + geom_bar(stat = "identity", fill = "dodgerblue4", width = 0.5) + ggtitle("Use Training") +
+  labs(x = "", y = "") + ylim(0,25) + coord_flip() + theme(text=element_text(size=14))
+
+area.color = c( "gold2", "dodgerblue4", "dodgerblue4")
+dont_pl = ggplot(dont_df, aes(x = Reason, y = Percent)) + geom_bar(stat = "identity", width = 0.5, fill=area.color) + ggtitle("Abandon Training") +
+  labs(x = "", y = "\nPercent") + coord_flip() + ylim(0,25) + theme(text=element_text(size=14))
+
+
+plot_grid(use_pl, dont_pl, align="v", nrow=2)
+```
+
+
+
+
